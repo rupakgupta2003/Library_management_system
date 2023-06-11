@@ -1,0 +1,295 @@
+## code for Sign In And Sign Up
+
+
+d={'admin':'Qwerty123'}
+que=[]
+a=[]
+
+
+leader={'name':['admin'],
+       'points':[0]}
+
+def checkPasswordStrength(passw):
+    strength=0
+    if len(passw)>=8:
+        strength+=1
+    upper=0
+    lower=0
+    for i in passw:
+        if i.islower()==True:
+            lower+=1
+        elif i.isupper()==True:
+            upper+=1
+    if lower>=1 and upper>=1:
+        strength+=1
+
+    for i in range(len(passw)):
+        ch=passw[i]
+        if  ch.isdigit()==True :
+            strength+=1
+    for r in range(0,len(passw)):
+        sp=passw[r]
+        if (passw[r].isalpha()):
+            continue
+        elif (passw[r].isdigit()):
+            continue
+        else:
+            strength+=1
+    if strength>=4:
+        print("password is strong")
+        return True
+    else:
+        print('''password is weak''')
+        print('''enter details and password again.....''')
+        return False
+
+def signUp():
+    while 1:
+        userUp=input("enter a new username: ").lower()
+        print("-----------------------------------------------------------------------")
+        if userUp=='0':
+            return 'Failed'
+        if userUp not in d:
+            passUp=input("enter a strong password: ")
+            if checkPasswordStrength(passUp):
+                st1=3
+                while st1:
+                    passUp2=input("plz enter your password again: ")
+                    print("-----------------------------------------------------------------------")
+                    if passUp==passUp2:
+                        d.update({userUp:passUp})      #d[userUp]=passUp
+                        print("for recovery Password Question is: ")
+                        q=input("what is your school name: ").lower()
+                        que.append({userUp:q})
+                        print("-----------------------------------------------------------------------")
+                        return 'successful'
+                    
+                    else:
+                        print('password does not match...Please try again...')
+                        st1-=1
+                return 'Failed'
+        else:
+            print('''user name already exists....please try another...
+            press 0 to exit 
+            or ''')
+# signUp()
+
+def signIn():
+    while 1:
+        userIn=input("enter username:").lower()
+        if userIn=='0':
+            return 'Exit Successfully'
+        if userIn in d:
+            sf1=3
+            while sf1:
+                passIn=input("enter password:")
+                print("-----------------------------------------------------------------------")
+                if d[userIn]==passIn:
+                    full()                   
+                    return 'Successfully'
+                else:
+                    print("Password doesn't match.... please try again.....")
+                    rec=input('''if forget password,
+press 1 to recover with security question,
+press 2 for change by OTP:
+press any other key to try enter again password:''')
+                    if  rec=='1':
+                        q=input("what is your school Name")
+                        if q==que[0][userIn]:
+                            print(f"your password is : {d.get(userIn)}")
+                            newpass=input("enter new password: ")
+                            d.update({userIn:newpass})
+                            print("-----------------------------------------------------------------------")
+                        else:
+                            print("answer not correct ....Thank you")
+                            print("-----------------------------------------------------------------------")
+                            sf1-=1
+                    elif rec=='2':
+                        import random
+                        c=random.randint(1000,9999)
+                        msg="your OTP is "+str(c)
+                        import os
+                        from twilio.rest import Client
+                        account_sid = "AC549423070ce8ec8cf8219eed8fe1f662"
+                        auth_token = "71fe69d0a8892d9f60c244c5d6c4329c"
+                        client = Client(account_sid, auth_token)
+                        message = client.messages.create(
+                          body="For  change your password , Your OTP is "+str(c),
+                          from_="+14344236673",
+                          to="+917489035993"
+                        )
+                        print(message.sid)
+                        g=int(input("enter OTP: "))
+                        newpass=input("enter new password: ")
+                        d.update({userIn:newpass})
+                        
+                        if g==c:
+                            print("password has been changed")
+                            print("-----------------------------------------------------------------------")
+                        else:
+                            print("invalid OTP.....Thank you")
+                            print("-----------------------------------------------------------------------")
+                    else:
+                        sf1-=1
+                   
+                    
+            return 'Failed'
+        else:
+            print('''Username does not exist..please try again...
+                 press 0 to exit
+                 or''')
+# signIn()
+def main():
+    while(1):
+        print("!!-----Welcome to Library management system-----!!")
+        
+        mode=input('''choose mode:
+        press 1 to SignUp
+        press 2 to SignIn
+        press 0 to exit:
+        ''')
+        if mode=='1':
+            x=signUp()
+            print('signUp',x)
+            print("-----------------------------------------------------------------------")
+        elif(mode=='2'):
+            z=signIn()
+            print('signIn',z)
+            print("-----------------------------------------------------------------------")
+        elif mode=='0':
+            print('Thank You for using our services...')
+            break
+        else:
+            print('enter a valid input...')
+            print("-----------------------------------------------------------------------")
+
+
+            
+            
+## code for Library Management System
+            
+    
+    
+    
+import pandas as pd
+z=pd.read_csv(r'C:\Users\DELL\Downloads\books.csv')
+deleted_series=[]
+def ViewBooks():
+    return z
+# ViewBooks()
+
+def issue_book():
+    global deleted_series
+    while 1:
+        try: 
+            a=input('''press 0 for exit..
+Enter Title of book :''')
+            if a=='0':
+                return 'Exit'
+            A=z.Title       # A=series of Title
+            B=A[A==a].index[0]    # B= index value of searched term(a)
+            aa=z.loc[B]
+            df=pd.DataFrame(aa).T
+            deleted_series.append(z.loc[B])    #   All elements or full row of index B    
+            z.drop(B,inplace=True)
+        except:
+            print('book not found ..OR book already issued for other Student')
+        else:
+            print('-----------------------------------------------------------')
+            print('Issued book successfully')
+            return a
+# issue_book()
+
+def search():
+    while 1:
+        try:
+            a=input(''' press 0 for exit.
+Enter Title of book : ''')
+            
+            if a=='0':
+                return 'Exit'
+            A=z.Title
+            B=A[A==a].index[0]
+            df=pd.DataFrame(z.loc[B]).T
+            print(df)
+        except:
+            print('Searched book not Found')
+        else:
+            while 1:
+                b=input('''press 1 for issue this book..
+press 2 for exit : ''')
+                if b=='1':
+                    print(issue_book())
+                    return 'Successfully Issued'
+                elif b=='2':return 'Exit'
+                else: print("invalid input")
+# search()
+
+def show_issued_book(): 
+    global recover
+#     deleted_series
+    recover=pd.DataFrame(deleted_series)
+    show=pd.concat([recover])
+    show.to_csv('issuesd books.csv')
+    print("-----------------------------------------------")
+    return recover
+# show_issued_book()
+
+def return_book():
+    global recover
+    while 1: 
+        a=input("""prsss 0 for Exit..
+enter username : """)
+        if a=='0':
+            print('Exit')
+            return z
+        if a in d:
+            book_name=input("enter Title of Book : ")
+            try:
+                if book_name in recover.Title.to_list():
+                    rec=recover.Title.to_list()[recover.Title.to_list().index(book_name)]
+                    a=recover.Title.to_list()
+                    b=recover.index.to_list()
+                    x=pd.concat([z,pd.DataFrame(recover.iloc[a.index(book_name)]).T])
+                    deleted_series.pop(a.index(book_name))
+                    recover.drop([b[a.index(a[a.index(book_name)])]],inplace=True)
+                    print('-----------------------------------------------------------')
+                    print("Return Book Successful")
+                    return x
+                else: print("this book is never issued for you")
+            except AttributeError:
+                print("this book is never issued for you")
+        else: print('Name not Registered')
+                
+# return_book()
+
+def full(): 
+    
+    while 1:
+        print('-------!! Welcome to my library !! ------- ')
+        choice=input('''press 0 for exit
+    press 1 for view all books, 
+    press 2 for issue book
+    press 3 for show all issued books
+    press 4 for search book and get details
+    press 5 for return book :''')
+        global recover
+        global z
+        deleted_series
+        if choice=='1':    print(ViewBooks())
+        elif choice=='2':  issue_book()
+        elif choice=='3':  print(show_issued_book())
+
+        elif choice=='4':   print(search())
+        elif choice=='5':
+            x=return_book()
+            z=x
+        elif choice=='0':
+            print('--------------------------------------------------------------')
+            print("Thank you , Have a good day")
+            break
+        else:    print("enter valid input")
+
+while 1:
+    main()
+    break
